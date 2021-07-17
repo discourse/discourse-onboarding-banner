@@ -15,7 +15,7 @@ export default Component.extend({
   init() {
     this._super(...arguments);
     const date = Date.now();
-    let topicId = 38;
+    let topicId = settings.topic_id;
 
     let storageObject;
     let storedTopic;
@@ -58,7 +58,7 @@ export default Component.extend({
       !getLocal ||
       localExpired ||
       (storedTopic && topicId !== storedTopic)
-      // if no local storage, or if storage is expired, or if the topic has been changed
+      // if no local storage, or if storage is expired, or if a different topic is set in the setting
     ) {
       ajax(`/t/${topicId}.json`).then((response) => {
         // get the topic
@@ -66,7 +66,7 @@ export default Component.extend({
         const regex = /\{\%sitename\}/gm;
 
         let firstPost = response.post_stream.posts[0].cooked;
-        let replacedPost = firstPost.replace(regex, this.siteSettings.title);
+        let replacedPost = firstPost.replace(regex, this.siteSettings.title); // replace {%sitename} with site name
 
         let cachedTopic = new PostCooked({
           cooked: replacedPost,
