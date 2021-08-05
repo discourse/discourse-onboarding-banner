@@ -1,0 +1,6 @@
+{{#unless maxExpired}}
+<div class="onboarding-banner-content">
+  {{html-safe cooked}}
+  {{d-button icon="times" action=(action "dismissOnboarding")}}
+</div>
+{{/unless}}
