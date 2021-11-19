@@ -21,34 +21,28 @@ export default Component.extend({
     let localExpired;
     let maxExpired;
 
-    let dismissed;
-
     let getLocal = localStorage.getItem("onboarding_topic");
 
     if (getLocal) {
       storageObject = JSON.parse(getLocal);
-      dismissed = storageObject.dismissed;
+      storedTopicId = storageObject.storedTopicId;
 
-      if (!dismissed) {
-        storedTopicId = storageObject.storedTopicId;
+      let cached = storageObject.timestamp;
+      let firstSeen = storageObject.firstSeen;
 
-        let cached = storageObject.timestamp;
-        let firstSeen = storageObject.firstSeen;
+      let expiration = 21600 * 1000; // 6 hours
+      let maxAge = 604800 * 1000; // 7 days
 
-        let expiration = 21600 * 1000; // 6 hours
-        let maxAge = 604800 * 1000; // 7 days
+      if (date - cached > expiration) {
+        localExpired = true;
+      }
 
-        if (date - cached > expiration) {
-          localExpired = true;
-        }
-
-        if (date - firstSeen > maxAge) {
-          maxExpired = true;
-        }
+      if (date - firstSeen > maxAge) {
+        maxExpired = true;
       }
     }
 
-    if (maxExpired || dismissed) {
+    if (maxExpired) {
       this.set("isLoading", false);
       this.set("maxExpired", true);
       return;
@@ -63,8 +57,6 @@ export default Component.extend({
           // get the topic
           if (response.cooked) {
             const regex = /\{\%sitename\}/gm;
-
-            dismissed = response.dismissed;
 
             let responseTopicId = response.topic_id;
             let firstPost = response.cooked;
@@ -81,7 +73,6 @@ export default Component.extend({
               storedTopicId: responseTopicId,
               timestamp: date,
               firstSeen: storageObject ? storageObject.firstSeen : date,
-              dismissed: dismissed,
             };
 
             localStorage.setItem(
@@ -89,11 +80,7 @@ export default Component.extend({
               JSON.stringify(dataObject)
             );
 
-            if (dismissed) {
-              this.set("maxExpired", true);
-            } else {
-              this.set("cooked", cachedTopic.attrs.cooked);
-            }
+            this.set("cooked", cachedTopic.attrs.cooked);
             this.set("isLoading", false);
           } else {
             this.set("isLoading", false);
@@ -123,11 +110,8 @@ export default Component.extend({
         type: "PUT",
         data,
       }).finally(() => {
-        let dataObject = {
-          dismissed: true,
-        };
         document.querySelector("div.onboarding-banner").style.display = "none";
-        localStorage.setItem("onboarding_topic", JSON.stringify(dataObject));
+        localStorage.deleteItem("onboarding_topic");
       });
     },
   },

@@ -7,19 +7,12 @@ module DiscourseOnboardingBanner
     before_action :ensure_logged_in
 
     def index
-      raise Discourse::NotFound unless SiteSetting.discourse_onboarding_banner_enabled
+      raise Discourse::NotFound unless current_user.show_onboarding_banner
 
-      topic_id = SiteSetting.discourse_onboarding_banner_topic_id
-
-      topic = Topic.find(topic_id)
-      guardian.ensure_can_see!(topic)
-      raise Discourse::NotFound unless topic
-
-      dismissed = current_user.custom_fields['onboarding_banner_dismissed_topic_id'].to_i == topic_id
+      topic = Topic.find(SiteSetting.discourse_onboarding_banner_topic_id)
 
       render json: { topic_id: SiteSetting.discourse_onboarding_banner_topic_id,
-                     cooked: topic.first_post.cooked,
-                     dismissed: dismissed }
+                     cooked: topic.first_post.cooked }
     end
 
     def dismiss

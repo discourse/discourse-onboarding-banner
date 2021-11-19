@@ -70,7 +70,6 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
           json = response.parsed_body
           expect(json['topic_id']).to eq(topic.id)
           expect(json['cooked']).to include('My onboarding content')
-          expect(json['dismissed']).to eq(false)
         end
 
         it 'stores topic dismissal' do
@@ -80,8 +79,23 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
           expect(user.custom_fields).to eq({ 'onboarding_banner_dismissed_topic_id' => topic.id.to_s })
 
           get '/discourse-onboarding-banner/content.json'
-          json = response.parsed_body
-          expect(json['dismissed']).to eq(true)
+          expect(response.status).to eq(404)
+        end
+      end
+
+      context 'setting an invalid topic_id' do
+        it 'returns an error if topic is nil' do
+          SiteSetting.discourse_onboarding_banner_topic_id = nil
+
+          get '/discourse-onboarding-banner/content.json'
+          expect(response.status).to eq(404)
+        end
+
+        it 'returns an error if topic does not exist' do
+          SiteSetting.discourse_onboarding_banner_topic_id = 99_999_999
+
+          get '/discourse-onboarding-banner/content.json'
+          expect(response.status).to eq(404)
         end
       end
     end
