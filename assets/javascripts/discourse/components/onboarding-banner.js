@@ -2,6 +2,7 @@ import Component from "@ember/component";
 import { inject as service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import PostCooked from "discourse/widgets/post-cooked";
+import { action } from "@ember/object";
 
 export default Component.extend({
   classNameBindings: ["onboarding-banner"],
@@ -98,22 +99,21 @@ export default Component.extend({
     }
   },
 
-  actions: {
-    dismissOnboarding() {
-      let data = {};
-      let getLocal = localStorage.getItem("onboarding_topic");
-      if (getLocal) {
-        let storageObject = JSON.parse(getLocal);
-        data = { topic_id: storageObject.storedTopicId };
-      }
+  @action
+  dismissOnboarding() {
+    let data = {};
+    let getLocal = localStorage.getItem("onboarding_topic");
+    if (getLocal) {
+      let storageObject = JSON.parse(getLocal);
+      data = { topic_id: storageObject.storedTopicId };
+    }
 
-      ajax("/discourse-onboarding-banner/dismiss.json", {
-        type: "PUT",
-        data,
-      }).finally(() => {
-        document.querySelector("div.onboarding-banner").style.display = "none";
-        localStorage.deleteItem("onboarding_topic");
-      });
-    },
+    ajax("/discourse-onboarding-banner/dismiss.json", {
+      type: "PUT",
+      data,
+    }).finally(() => {
+      document.querySelector("div.onboarding-banner").style.display = "none";
+      localStorage.deleteItem("onboarding_topic");
+    });
   },
 });
