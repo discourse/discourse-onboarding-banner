@@ -113,7 +113,8 @@ export default Component.extend({
       data,
     }).finally(() => {
       document.querySelector("div.onboarding-banner").style.display = "none";
-      localStorage.deleteItem("onboarding_topic");
+      localStorage.removeItem("onboarding_topic");
+    }).catch(() => {
     });
   },
 });
