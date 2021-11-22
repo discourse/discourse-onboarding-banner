@@ -1,6 +1,6 @@
 {
   "name": "discourse-onboarding-banner",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "repository": "https://github.com/discourse/discourse-onboarding-banner",
   "author": "Discourse",
   "license": "MIT",
