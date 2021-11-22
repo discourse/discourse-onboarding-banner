@@ -8,6 +8,7 @@ export default Component.extend({
   router: service(),
   cooked: null,
   maxExpired: false,
+  isLoading: true,
 
   init() {
     this._super(...arguments);

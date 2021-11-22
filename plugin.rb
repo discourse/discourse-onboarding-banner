@@ -4,13 +4,14 @@
 # about: Display a dismissable banner during onboarding
 # version: 0.1
 # authors: awesomerobot and Jamie Wilson
-# url:https://github.com/discourse/discourse-onboarding-banner
+# url: https://github.com/discourse/discourse-onboarding-banner
+# transpile_js: true
 
 register_asset 'stylesheets/common/discourse-onboarding-banner.scss'
 
 enabled_site_setting :discourse_onboarding_banner_enabled
 
-PLUGIN_NAME ||= 'DiscourseOnboardingBanner'
+PLUGIN_NAME = 'DiscourseOnboardingBanner'
 CUSTOM_FIELD_NAME = 'show_onboarding_banner'
 
 load File.expand_path('lib/discourse-onboarding-banner/engine.rb', __dir__)
