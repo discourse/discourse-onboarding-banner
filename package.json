@@ -1,7 +1,10 @@
 {
+  "name": "discourse-onboarding-banner",
+  "version": "0.0.1",
+  "repository": "https://github.com/discourse/discourse-onboarding-banner",
   "author": "Discourse",
   "license": "MIT",
   "devDependencies": {
-    "eslint-config-discourse": "latest"
+    "eslint-config-discourse": "^1.1.8"
   }
 }
