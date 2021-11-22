@@ -9,5 +9,5 @@ export default {
 
   initialize() {
     withPluginApi("0.8.31", initializeDiscourseOnboardingBanner);
-  }
+  },
 };
