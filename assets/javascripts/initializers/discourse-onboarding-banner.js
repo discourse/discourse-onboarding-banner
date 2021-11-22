@@ -1,6 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 
-function initializeDiscourseOnboardingBanner(api) {
+function initializeDiscourseOnboardingBanner() {
   // https://github.com/discourse/discourse/blob/main/app/assets/javascripts/discourse/lib/plugin-api.js.es6
 }
 
