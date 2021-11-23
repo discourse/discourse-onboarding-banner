@@ -1,0 +1,4 @@
+en:
+  site_settings:
+    discourse_onboarding_banner_enabled: "Enable DiscourseOnboardingBanner plugin"
+    discourse_onboarding_banner_topic_id: "The topic id that contains the content of the banner"

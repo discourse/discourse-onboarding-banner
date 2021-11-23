@@ -1,0 +1,8 @@
+plugins:
+  discourse_onboarding_banner_enabled:
+    default: false
+    client: true
+  discourse_onboarding_banner_topic_id:
+    default: ""
+    type: integer
+    client: true
