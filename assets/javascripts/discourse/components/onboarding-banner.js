@@ -48,7 +48,9 @@ export default Component.extend({
       this.set("isLoading", false);
       this.set("maxExpired", true);
       return;
-    } else if (
+    }
+    
+    if (
       !getLocal ||
       localExpired ||
       (storedTopicId && topicId !== storedTopicId)
@@ -83,12 +85,8 @@ export default Component.extend({
             );
 
             this.set("cooked", cachedTopic.attrs.cooked);
-            this.set("isLoading", false);
-          } else {
-            this.set("isLoading", false);
-          }
         })
-        .catch(() => {
+        .finally(() => {
           this.set("isLoading", false);
         });
     } else {
