@@ -1,6 +1,6 @@
-import { acceptance } from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, exists, visible } from "discourse/tests/helpers/qunit-helpers";
 import { test } from "qunit";
-import { visit } from "@ember/test-helpers";
+import { click, visit } from "@ember/test-helpers";
 
 acceptance("Discourse Onboarding Banner", function (needs) {
   needs.user({ show_onboarding_banner: true });
@@ -18,7 +18,7 @@ acceptance("Discourse Onboarding Banner", function (needs) {
     });
 
     server.put("/discourse-onboarding-banner/dismiss.json", () => {
-      return helper.response();
+      return helper.response({});
     });
   });
 
@@ -31,7 +31,7 @@ acceptance("Discourse Onboarding Banner", function (needs) {
 
     await click(".onboarding-banner-content .dismiss-banner");
     assert.ok(
-      !exists(".onboarding-banner-content:visible"),
+      !visible(".onboarding-banner-content"),
       "it hides the DiscourseOnboardingBanner"
     );
   });

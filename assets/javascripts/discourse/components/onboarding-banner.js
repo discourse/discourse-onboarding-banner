@@ -49,7 +49,7 @@ export default Component.extend({
       this.set("maxExpired", true);
       return;
     }
-    
+
     if (
       !getLocal ||
       localExpired ||
@@ -85,6 +85,7 @@ export default Component.extend({
             );
 
             this.set("cooked", cachedTopic.attrs.cooked);
+          }
         })
         .finally(() => {
           this.set("isLoading", false);
@@ -109,11 +110,9 @@ export default Component.extend({
     ajax("/discourse-onboarding-banner/dismiss.json", {
       type: "PUT",
       data,
-    })
-      .finally(() => {
-        document.querySelector("div.onboarding-banner").style.display = "none";
-        localStorage.removeItem("onboarding_topic");
-      })
-      .catch(() => {});
+    }).finally(() => {
+      document.querySelector("div.onboarding-banner").style.display = "none";
+      localStorage.removeItem("onboarding_topic");
+    });
   },
 });
