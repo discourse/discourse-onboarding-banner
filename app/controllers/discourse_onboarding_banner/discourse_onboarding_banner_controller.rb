@@ -7,7 +7,9 @@ module DiscourseOnboardingBanner
     before_action :ensure_logged_in
 
     def index
-      raise Discourse::NotFound unless current_user.show_onboarding_banner
+      unless current_user.show_onboarding_banner
+        return render json: success_json
+      end
 
       topic = Topic.find(SiteSetting.discourse_onboarding_banner_topic_id)
 
@@ -22,7 +24,7 @@ module DiscourseOnboardingBanner
       current_user.custom_fields['onboarding_banner_dismissed_topic_id'] = topic_id
       current_user.save_custom_fields
 
-      head :ok
+      render json: success_json
     end
   end
 end

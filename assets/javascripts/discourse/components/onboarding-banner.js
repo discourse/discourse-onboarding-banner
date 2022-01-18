@@ -3,6 +3,7 @@ import { inject as service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import PostCooked from "discourse/widgets/post-cooked";
 import { action } from "@ember/object";
+import discourseComputed from "discourse-common/utils/decorators";
 
 export default Component.extend({
   classNameBindings: ["onboarding-banner"],
@@ -59,10 +60,15 @@ export default Component.extend({
       ajax(`/discourse-onboarding-banner/content.json`)
         .then((response) => {
           // get the topic
+          let dataObject = {
+            storedTopicId: topicId,
+            timestamp: date,
+            firstSeen: storageObject ? storageObject.firstSeen : date,
+          };
+
           if (response.cooked) {
             const regex = /\{\%sitename\}/gm;
 
-            let responseTopicId = response.topic_id;
             let firstPost = response.cooked;
             let replacedPost = firstPost.replace(
               regex,
@@ -72,27 +78,21 @@ export default Component.extend({
             let cachedTopic = new PostCooked({
               cooked: replacedPost,
             });
-            let dataObject = {
-              onboarding_topic: cachedTopic.attrs.cooked,
-              storedTopicId: responseTopicId,
-              timestamp: date,
-              firstSeen: storageObject ? storageObject.firstSeen : date,
-            };
-
-            localStorage.setItem(
-              "onboarding_topic",
-              JSON.stringify(dataObject)
-            );
-
+            dataObject.cookedContent = cachedTopic.attrs.cooked;
             this.set("cooked", cachedTopic.attrs.cooked);
           }
+
+          localStorage.setItem("onboarding_topic", JSON.stringify(dataObject));
+        })
+        .catch(() => {
+          this.set("cooked", null);
         })
         .finally(() => {
           this.set("isLoading", false);
         });
     } else {
       if (storageObject) {
-        this.set("cooked", storageObject.onboarding_topic);
+        this.set("cooked", storageObject.cookedContent);
         this.set("isLoading", false);
       }
     }
@@ -100,10 +100,11 @@ export default Component.extend({
 
   @action
   dismissOnboarding() {
+    let storageObject = {};
     let data = {};
     let getLocal = localStorage.getItem("onboarding_topic");
     if (getLocal) {
-      let storageObject = JSON.parse(getLocal);
+      storageObject = JSON.parse(getLocal);
       data = { topic_id: storageObject.storedTopicId };
     }
 
@@ -112,7 +113,17 @@ export default Component.extend({
       data,
     }).finally(() => {
       document.querySelector("div.onboarding-banner").style.display = "none";
-      localStorage.removeItem("onboarding_topic");
+
+      if (getLocal) {
+        storageObject = JSON.parse(getLocal);
+        delete storageObject.cookedContent;
+        localStorage.setItem("onboarding_topic", JSON.stringify(storageObject));
+      }
     });
+  },
+
+  @discourseComputed("isLoading", "maxExpired", "cooked")
+  shouldHideBanner(isLoading, maxExpired, cooked) {
+    return isLoading || maxExpired || !cooked;
   },
 });

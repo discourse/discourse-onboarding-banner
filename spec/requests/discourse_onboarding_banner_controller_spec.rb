@@ -46,7 +46,9 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
       context 'without setting a topic_id' do
         it 'returns error when getting content' do
           get '/discourse-onboarding-banner/content.json'
-          expect(response.status).to eq(404)
+
+          json = response.parsed_body
+          expect(json['topic_id']).to eq(nil)
         end
 
         it 'returns error dismissing content' do
@@ -56,7 +58,8 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
       end
 
       context 'after setting a topic_id' do
-        fab!(:topic) { Fabricate(:topic) }
+        fab!(:lounge) { Fabricate(:category, name: I18n.t("vip_category_name")) }
+        fab!(:topic) { Fabricate(:topic, category: lounge) }
         fab!(:post) { Fabricate(:post, topic: topic, raw: 'My onboarding content') }
 
         before do
@@ -79,23 +82,29 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
           expect(user.custom_fields).to eq({ 'onboarding_banner_dismissed_topic_id' => topic.id.to_s })
 
           get '/discourse-onboarding-banner/content.json'
-          expect(response.status).to eq(404)
+
+          json = response.parsed_body
+          expect(json['topic_id']).to eq(nil)
         end
       end
 
       context 'setting an invalid topic_id' do
-        it 'returns an error if topic is nil' do
+        it 'returns an empty topic_id if topic_id is nil' do
           SiteSetting.discourse_onboarding_banner_topic_id = nil
 
           get '/discourse-onboarding-banner/content.json'
-          expect(response.status).to eq(404)
+
+          json = response.parsed_body
+          expect(json['topic_id']).to eq(nil)
         end
 
-        it 'returns an error if topic does not exist' do
+        it 'returns an empty topic_id if topic_id is invalid' do
           SiteSetting.discourse_onboarding_banner_topic_id = 99_999_999
 
           get '/discourse-onboarding-banner/content.json'
-          expect(response.status).to eq(404)
+
+          json = response.parsed_body
+          expect(json['topic_id']).to eq(nil)
         end
       end
     end
