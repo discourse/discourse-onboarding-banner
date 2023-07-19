@@ -12,6 +12,7 @@ export default class OnboardingBanner extends Component {
   @tracked cooked;
   @tracked maxExpired = false;
   @tracked isLoading = true;
+  @tracked dismissed = false;
 
   constructor() {
     super(...arguments);
@@ -99,7 +100,9 @@ export default class OnboardingBanner extends Component {
   }
 
   get visible() {
-    return !this.isLoading && !this.maxExpired && this.cooked;
+    return (
+      !this.dismissed && !this.isLoading && !this.maxExpired && this.cooked
+    );
   }
 
   @action
@@ -118,7 +121,7 @@ export default class OnboardingBanner extends Component {
         data,
       });
     } finally {
-      document.querySelector("div.onboarding-banner").style.display = "none";
+      this.dismissed = true;
 
       if (getLocal) {
         storageObject = JSON.parse(getLocal);
