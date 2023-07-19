@@ -1,8 +1,4 @@
-import {
-  acceptance,
-  exists,
-  visible,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance } from "discourse/tests/helpers/qunit-helpers";
 import { test } from "qunit";
 import { click, visit } from "@ember/test-helpers";
 
@@ -26,17 +22,15 @@ acceptance("Discourse Onboarding Banner", function (needs) {
     });
   });
 
-  test("DiscourseOnboardingBanner is shown and can be dismissed", async (assert) => {
+  test("DiscourseOnboardingBanner is shown and can be dismissed", async function (assert) {
     await visit("/");
-    assert.ok(
-      exists(".onboarding-banner-content"),
-      "it shows the DiscourseOnboardingBanner"
-    );
+    assert
+      .dom(".onboarding-banner-content")
+      .exists("it shows the DiscourseOnboardingBanner");
 
     await click(".onboarding-banner-content .dismiss-banner");
-    assert.ok(
-      !visible(".onboarding-banner-content"),
-      "it hides the DiscourseOnboardingBanner"
-    );
+    assert
+      .dom(".onboarding-banner-content")
+      .isNotVisible("it hides the DiscourseOnboardingBanner");
   });
 });
