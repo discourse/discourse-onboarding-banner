@@ -4,7 +4,6 @@ import { inject as service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import PostCooked from "discourse/widgets/post-cooked";
 import { action } from "@ember/object";
-import discourseComputed from "discourse-common/utils/decorators";
 
 export default class OnboardingBanner extends Component {
   @service router;
@@ -99,9 +98,8 @@ export default class OnboardingBanner extends Component {
     }
   }
 
-  @discourseComputed("isLoading", "maxExpired", "cooked")
-  shouldHideBanner(isLoading, maxExpired, cooked) {
-    return isLoading || maxExpired || !cooked;
+  get shouldHideBanner() {
+    return this.isLoading || this.maxExpired || !this.cooked;
   }
 
   @action
