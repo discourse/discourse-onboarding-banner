@@ -98,8 +98,8 @@ export default class OnboardingBanner extends Component {
     }
   }
 
-  get shouldHideBanner() {
-    return this.isLoading || this.maxExpired || !this.cooked;
+  get visible() {
+    return !this.isLoading && !this.maxExpired && this.cooked;
   }
 
   @action
