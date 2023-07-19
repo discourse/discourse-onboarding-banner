@@ -1,5 +1,5 @@
-<div class="onboarding-banner">
-  {{#if this.visible}}
+{{#if this.visible}}
+  <div class="onboarding-banner">
     <div class="onboarding-banner-content">
       {{html-safe this.cooked}}
       <DButton
@@ -8,5 +8,5 @@
         @action={{this.dismissOnboarding}}
       />
     </div>
-  {{/if}}
-</div>
+  </div>
+{{/if}}

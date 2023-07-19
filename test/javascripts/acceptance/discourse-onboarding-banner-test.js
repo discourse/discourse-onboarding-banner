@@ -34,6 +34,6 @@ acceptance("Discourse Onboarding Banner", function (needs) {
     await click(".onboarding-banner-content .dismiss-banner");
     assert
       .dom(".onboarding-banner-content")
-      .isNotVisible("it hides the onboarding banner");
+      .doesNotExist("it hides the onboarding banner");
   });
 });
