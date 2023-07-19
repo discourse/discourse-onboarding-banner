@@ -22,15 +22,18 @@ acceptance("Discourse Onboarding Banner", function (needs) {
     });
   });
 
-  test("DiscourseOnboardingBanner is shown and can be dismissed", async function (assert) {
+  test("Onboarding banner is shown and can be dismissed", async function (assert) {
     await visit("/");
     assert
       .dom(".onboarding-banner-content")
-      .exists("it shows the DiscourseOnboardingBanner");
+      .includesText(
+        "banner content goes here",
+        "it shows the onboarding banner"
+      );
 
     await click(".onboarding-banner-content .dismiss-banner");
     assert
       .dom(".onboarding-banner-content")
-      .isNotVisible("it hides the DiscourseOnboardingBanner");
+      .isNotVisible("it hides the onboarding banner");
   });
 });
