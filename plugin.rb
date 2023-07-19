@@ -10,7 +10,6 @@ register_asset "stylesheets/common/discourse-onboarding-banner.scss"
 
 enabled_site_setting :discourse_onboarding_banner_enabled
 
-PLUGIN_NAME = "discourse-onboarding-banner"
 CUSTOM_FIELD_NAME = "show_onboarding_banner"
 
 load File.expand_path("lib/discourse-onboarding-banner/engine.rb", __dir__)

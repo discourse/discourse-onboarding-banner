@@ -2,7 +2,7 @@
 
 module DiscourseOnboardingBanner
   class DiscourseOnboardingBannerController < ::ApplicationController
-    requires_plugin DiscourseOnboardingBanner
+    requires_plugin PLUGIN_NAME
 
     before_action :ensure_logged_in
 
