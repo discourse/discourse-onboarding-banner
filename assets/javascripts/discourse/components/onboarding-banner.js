@@ -18,8 +18,6 @@ export default class OnboardingBanner extends Component {
     super(...arguments);
     const date = Date.now();
 
-    let topicId = this.siteSettings.discourse_onboarding_banner_topic_id;
-
     let storageObject;
     let storedTopicId;
 
@@ -53,50 +51,51 @@ export default class OnboardingBanner extends Component {
       return;
     }
 
+    const topicId = this.siteSettings.discourse_onboarding_banner_topic_id;
+
     if (
       !getLocal ||
       localExpired ||
       (storedTopicId && topicId !== storedTopicId)
       // if no local storage, or if storage is expired, or if a different topic is set in the setting
     ) {
-      ajax(`/discourse-onboarding-banner/content.json`)
-        .then((response) => {
-          // get the topic
-          let dataObject = {
-            storedTopicId: topicId,
-            timestamp: date,
-            firstSeen: storageObject ? storageObject.firstSeen : date,
-          };
-
-          if (response.cooked) {
-            const regex = /\{\%sitename\}/gm;
-
-            let firstPost = response.cooked;
-            let replacedPost = firstPost.replace(
-              regex,
-              this.siteSettings.title
-            ); // replace {%sitename} with site name
-
-            let cachedTopic = new PostCooked({
-              cooked: replacedPost,
-            });
-            dataObject.cookedContent = cachedTopic.attrs.cooked;
-            this.cooked = cachedTopic.attrs.cooked;
-          }
-
-          localStorage.setItem("onboarding_topic", JSON.stringify(dataObject));
-        })
-        .catch(() => {
-          this.cooked = null;
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      this.loadContent(topicId, date, storageObject);
     } else {
       if (storageObject) {
         this.cooked = storageObject.cookedContent;
         this.isLoading = false;
       }
+    }
+  }
+
+  async loadContent(topicId, date, storageObject) {
+    try {
+      const response = await ajax(`/discourse-onboarding-banner/content.json`);
+      // get the topic
+      let dataObject = {
+        storedTopicId: topicId,
+        timestamp: date,
+        firstSeen: storageObject ? storageObject.firstSeen : date,
+      };
+
+      if (response.cooked) {
+        const regex = /\{\%sitename\}/gm;
+
+        let firstPost = response.cooked;
+        let replacedPost = firstPost.replace(regex, this.siteSettings.title); // replace {%sitename} with site name
+
+        let cachedTopic = new PostCooked({
+          cooked: replacedPost,
+        });
+        dataObject.cookedContent = cachedTopic.attrs.cooked;
+        this.cooked = cachedTopic.attrs.cooked;
+      }
+
+      localStorage.setItem("onboarding_topic", JSON.stringify(dataObject));
+    } catch {
+      this.cooked = null;
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -106,7 +105,7 @@ export default class OnboardingBanner extends Component {
   }
 
   @action
-  dismissOnboarding() {
+  async dismissOnboarding() {
     let storageObject = {};
     let data = {};
     let getLocal = localStorage.getItem("onboarding_topic");
@@ -115,10 +114,12 @@ export default class OnboardingBanner extends Component {
       data = { topic_id: storageObject.storedTopicId };
     }
 
-    ajax("/discourse-onboarding-banner/dismiss.json", {
-      type: "PUT",
-      data,
-    }).finally(() => {
+    try {
+      await ajax("/discourse-onboarding-banner/dismiss.json", {
+        type: "PUT",
+        data,
+      });
+    } finally {
       document.querySelector("div.onboarding-banner").style.display = "none";
 
       if (getLocal) {
@@ -126,6 +127,6 @@ export default class OnboardingBanner extends Component {
         delete storageObject.cookedContent;
         localStorage.setItem("onboarding_topic", JSON.stringify(storageObject));
       }
-    });
+    }
   }
 }
