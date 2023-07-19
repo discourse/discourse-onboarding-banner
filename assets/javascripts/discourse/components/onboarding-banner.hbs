@@ -1,10 +1,12 @@
-{{#unless this.shouldHideBanner}}
-  <div class="onboarding-banner-content">
-    {{html-safe this.cooked}}
-    <DButton
-      class="dismiss-banner"
-      @icon="times"
-      @action={{this.dismissOnboarding}}
-    />
-  </div>
-{{/unless}}
+<div class="onboarding-banner">
+  {{#unless this.shouldHideBanner}}
+    <div class="onboarding-banner-content">
+      {{html-safe this.cooked}}
+      <DButton
+        class="dismiss-banner"
+        @icon="times"
+        @action={{this.dismissOnboarding}}
+      />
+    </div>
+  {{/unless}}
+</div>

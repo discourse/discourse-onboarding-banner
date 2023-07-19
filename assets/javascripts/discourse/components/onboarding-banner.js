@@ -1,19 +1,21 @@
-import Component from "@ember/component";
+import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { inject as service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import PostCooked from "discourse/widgets/post-cooked";
 import { action } from "@ember/object";
 import discourseComputed from "discourse-common/utils/decorators";
 
-export default Component.extend({
-  classNameBindings: ["onboarding-banner"],
-  router: service(),
-  cooked: null,
-  maxExpired: false,
-  isLoading: true,
+export default class OnboardingBanner extends Component {
+  @service router;
+  @service siteSettings;
 
-  init() {
-    this._super(...arguments);
+  @tracked cooked;
+  @tracked maxExpired = false;
+  @tracked isLoading = true;
+
+  constructor() {
+    super(...arguments);
     const date = Date.now();
 
     let topicId = this.siteSettings.discourse_onboarding_banner_topic_id;
@@ -46,8 +48,8 @@ export default Component.extend({
     }
 
     if (maxExpired) {
-      this.set("isLoading", false);
-      this.set("maxExpired", true);
+      this.isLoading = false;
+      this.maxExpired = true;
       return;
     }
 
@@ -79,24 +81,29 @@ export default Component.extend({
               cooked: replacedPost,
             });
             dataObject.cookedContent = cachedTopic.attrs.cooked;
-            this.set("cooked", cachedTopic.attrs.cooked);
+            this.cooked = cachedTopic.attrs.cooked;
           }
 
           localStorage.setItem("onboarding_topic", JSON.stringify(dataObject));
         })
         .catch(() => {
-          this.set("cooked", null);
+          this.cooked = null;
         })
         .finally(() => {
-          this.set("isLoading", false);
+          this.isLoading = false;
         });
     } else {
       if (storageObject) {
-        this.set("cooked", storageObject.cookedContent);
-        this.set("isLoading", false);
+        this.cooked = storageObject.cookedContent;
+        this.isLoading = false;
       }
     }
-  },
+  }
+
+  @discourseComputed("isLoading", "maxExpired", "cooked")
+  shouldHideBanner(isLoading, maxExpired, cooked) {
+    return isLoading || maxExpired || !cooked;
+  }
 
   @action
   dismissOnboarding() {
@@ -120,10 +127,5 @@ export default Component.extend({
         localStorage.setItem("onboarding_topic", JSON.stringify(storageObject));
       }
     });
-  },
-
-  @discourseComputed("isLoading", "maxExpired", "cooked")
-  shouldHideBanner(isLoading, maxExpired, cooked) {
-    return isLoading || maxExpired || !cooked;
-  },
-});
+  }
+}
