@@ -31,5 +31,5 @@ after_initialize do
     custom_fields["onboarding_banner_dismissed_topic_id"].to_i != topic_id
   end
 
-  add_to_serializer(:current_user, :show_onboarding_banner, true) { object.send(CUSTOM_FIELD_NAME) }
+  add_to_serializer(:current_user, :show_onboarding_banner) { object.send(CUSTOM_FIELD_NAME) }
 end
