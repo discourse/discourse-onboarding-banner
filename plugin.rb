@@ -10,15 +10,17 @@ register_asset "stylesheets/common/discourse-onboarding-banner.scss"
 
 enabled_site_setting :discourse_onboarding_banner_enabled
 
-CUSTOM_FIELD_NAME = "show_onboarding_banner"
-
-load File.expand_path("lib/discourse-onboarding-banner/engine.rb", __dir__)
+require_relative "lib/discourse-onboarding-banner/engine"
 
 after_initialize do
-  User.register_custom_field_type(CUSTOM_FIELD_NAME, :boolean)
-  DiscoursePluginRegistry.serialized_current_user_fields << CUSTOM_FIELD_NAME
+  module ::DiscourseOnboardingBanner
+    CUSTOM_FIELD_NAME = "show_onboarding_banner"
+  end
 
-  add_to_class(:user, CUSTOM_FIELD_NAME.to_sym) do
+  User.register_custom_field_type(DiscourseOnboardingBanner::CUSTOM_FIELD_NAME, :boolean)
+  DiscoursePluginRegistry.serialized_current_user_fields << DiscourseOnboardingBanner::CUSTOM_FIELD_NAME
+
+  add_to_class(:user, DiscourseOnboardingBanner::CUSTOM_FIELD_NAME.to_sym) do
     return false unless SiteSetting.discourse_onboarding_banner_enabled
 
     topic_id = SiteSetting.discourse_onboarding_banner_topic_id
@@ -31,5 +33,7 @@ after_initialize do
     custom_fields["onboarding_banner_dismissed_topic_id"].to_i != topic_id
   end
 
-  add_to_serializer(:current_user, :show_onboarding_banner) { object.send(CUSTOM_FIELD_NAME) }
+  add_to_serializer(:current_user, :show_onboarding_banner) do
+    object.send(DiscourseOnboardingBanner::CUSTOM_FIELD_NAME)
+  end
 end

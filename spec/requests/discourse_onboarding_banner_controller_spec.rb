@@ -16,7 +16,7 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
   end
 
   context "when logged in" do
-    fab!(:user) { Fabricate(:user) }
+    fab!(:user)
 
     before { sign_in(user) }
 
