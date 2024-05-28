@@ -52,7 +52,7 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
       end
 
       context "after setting a topic_id" do
-        fab!(:lounge) { Fabricate(:category, name: I18n.t("vip_category_name")) }
+        fab!(:lounge) { Fabricate(:category, name: "VIP") }
         fab!(:topic) { Fabricate(:topic, category: lounge) }
         fab!(:post) { Fabricate(:post, topic: topic, raw: "My onboarding content") }
 
