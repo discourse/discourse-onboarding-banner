@@ -3,11 +3,13 @@ import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
 import DButton from "discourse/components/d-button";
+import DecoratedHtml from "discourse/components/decorated-html";
 import htmlSafe from "discourse/helpers/html-safe";
 import { ajax } from "discourse/lib/ajax";
-import PostCooked from "discourse/widgets/post-cooked";
+import { bind } from "discourse/lib/decorators";
 
 export default class OnboardingBanner extends Component {
+  @service appEvents;
   @service router;
   @service siteSettings;
 
@@ -86,11 +88,8 @@ export default class OnboardingBanner extends Component {
         let firstPost = response.cooked;
         let replacedPost = firstPost.replace(regex, this.siteSettings.title); // replace {%sitename} with site name
 
-        let cachedTopic = new PostCooked({
-          cooked: replacedPost,
-        });
-        dataObject.cookedContent = cachedTopic.attrs.cooked;
-        this.cooked = cachedTopic.attrs.cooked;
+        dataObject.cookedContent = replacedPost;
+        this.cooked = replacedPost;
       }
 
       localStorage.setItem("onboarding_topic", JSON.stringify(dataObject));
@@ -104,6 +103,15 @@ export default class OnboardingBanner extends Component {
   get visible() {
     return (
       !this.dismissed && !this.isLoading && !this.maxExpired && this.cooked
+    );
+  }
+
+  @bind
+  decorateContent(element, helper) {
+    this.appEvents.trigger(
+      "decorate-non-stream-cooked-element",
+      element,
+      helper
     );
   }
 
@@ -137,7 +145,11 @@ export default class OnboardingBanner extends Component {
     {{#if this.visible}}
       <div class="onboarding-banner">
         <div class="onboarding-banner-content">
-          {{htmlSafe this.cooked}}
+          <DecoratedHtml
+            @html={{htmlSafe this.cooked}}
+            @decorate={{this.decorateContent}}
+            @id="onboarding-banner-content"
+          />
           <DButton
             class="dismiss-banner"
             @icon="xmark"
