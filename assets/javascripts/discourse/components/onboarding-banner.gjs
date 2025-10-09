@@ -2,15 +2,14 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
+import { htmlSafe } from "@ember/template";
 import DButton from "discourse/components/d-button";
 import DecoratedHtml from "discourse/components/decorated-html";
-import htmlSafe from "discourse/helpers/html-safe";
 import { ajax } from "discourse/lib/ajax";
 import { bind } from "discourse/lib/decorators";
 
 export default class OnboardingBanner extends Component {
   @service appEvents;
-  @service router;
   @service siteSettings;
 
   @tracked cooked;
