@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "rails_helper"
-
 describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
   context "when logged out" do
     it "returns error getting content" do
