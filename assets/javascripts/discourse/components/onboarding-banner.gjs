@@ -2,7 +2,7 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
-import { htmlSafe } from "@ember/template";
+import { trustHTML } from "@ember/template";
 import DButton from "discourse/components/d-button";
 import DecoratedHtml from "discourse/components/decorated-html";
 import { ajax } from "discourse/lib/ajax";
@@ -145,7 +145,7 @@ export default class OnboardingBanner extends Component {
       <div class="onboarding-banner">
         <div class="onboarding-banner-content">
           <DecoratedHtml
-            @html={{htmlSafe this.cooked}}
+            @html={{trustHTML this.cooked}}
             @decorate={{this.decorateContent}}
             @id="onboarding-banner-content"
           />
