@@ -65,6 +65,23 @@ describe DiscourseOnboardingBanner::DiscourseOnboardingBannerController do
           expect(json["cooked"]).to include("My onboarding content")
         end
 
+        it "does not return content when the banner gate allows a topic the user cannot see" do
+          User.any_instance.stubs(:show_onboarding_banner).returns(true)
+          private_group = Fabricate(:group)
+          private_category = Fabricate(:private_category, group: private_group)
+          private_topic = Fabricate(:topic, category: private_category)
+          private_post = Fabricate(:post, topic: private_topic, raw: "Private onboarding content")
+          SiteSetting.discourse_onboarding_banner_topic_id = private_topic.id
+
+          get "/discourse-onboarding-banner/content.json"
+          expect(response.status).to eq(200)
+
+          json = response.parsed_body
+          expect(json["topic_id"]).to eq(nil)
+          expect(json["cooked"]).to eq(nil)
+          expect(response.body).not_to include(private_post.raw)
+        end
+
         it "stores topic dismissal" do
           put "/discourse-onboarding-banner/dismiss.json", params: { topic_id: topic.id }
           expect(response.status).to eq(200)
