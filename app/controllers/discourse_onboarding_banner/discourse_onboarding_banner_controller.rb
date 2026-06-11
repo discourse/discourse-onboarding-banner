@@ -9,12 +9,11 @@ module DiscourseOnboardingBanner
     def index
       return render json: success_json unless current_user.show_onboarding_banner
 
-      topic = Topic.find(SiteSetting.discourse_onboarding_banner_topic_id)
+      topic_id = SiteSetting.discourse_onboarding_banner_topic_id
+      topic = Topic.find(topic_id)
+      return render json: success_json unless guardian.can_see?(topic)
 
-      render json: {
-               topic_id: SiteSetting.discourse_onboarding_banner_topic_id,
-               cooked: topic.first_post.cooked,
-             }
+      render json: { topic_id: topic_id, cooked: topic.first_post.cooked }
     end
 
     def dismiss
